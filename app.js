@@ -53,7 +53,7 @@ app.get("/users/view-one/:id",async(req,res)=>{
 // Create
 app.post("/users/create",async(req,res)=>{
  
-const {username,email}=req.body;
+    const {username,email}=req.body;
 
     try {
         const [response,schema]=await db.execute(`INSERT INTO USERS (username,email) VALUES (?,?)`,[username,email]);
@@ -68,12 +68,13 @@ app.put("/users/update/:id",async(req,res)=>{
     const {id}=req.params;
     const {username,email}=req.body;
 
-    console.log("username ",username, " email ",email);
+    
+
     try {
 
         const [singleRow,schema]=await db.execute(`UPDATE USERS SET username=?, email=? where id=?`,[username,email,id]);
-        
-        return res.status(200).json({success:true,data:singleRow,message: "Data is updated successfully"});
+
+        return res.status(200).json({success:true,data:id,message: "Data is updated successfully"});
     } catch (error) {
         res.status(500).json({success:false, error,});
     }
@@ -83,8 +84,9 @@ app.put("/users/update/:id",async(req,res)=>{
 app.delete("/users/delete/:id",async(req,res)=>{
     const {id}=req.params;
     try {
-        const [deleteQuery]=(await db).execute(`DELETE FROM USERS where id=?`,[id]);
-        return res.status({success:200,message:"Data is deleted successfully",data:deleteQuery.insertId});
+        const [deleteQuery]=await db.execute(`DELETE FROM USERS where id=?`,[id]);
+
+        return res.status(200).json({success:200,message:"Data is deleted successfully",data:id});
 
     } catch (error) {
         return res.status(500).json({success:false,error});
