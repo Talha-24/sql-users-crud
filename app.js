@@ -95,4 +95,105 @@ app.delete("/users/delete/:id",async(req,res)=>{
 })
 
 
+
+
+// CARS and OWNERS (Inner Joins)
+
+
+app.post("/owners/create",async(req,res)=>{
+    const {name,email,phone}=req.body;
+    try {
+        const [response,schema]=await db.execute("INSERT INTO OWNERS (name,email,phone) VALUES (?,?,?)",[name,email,phone]);
+
+        return res.json({data:response,success:false,message: "Owner is created successfully"});
+    } catch (error) {
+
+        return res.json({data:null, success:false, message: "Owner is not creaated",error:error});
+        
+    }
+})
+
+app.get("/owners/view-all",async(req,res)=>{
+    try {
+        const [repsonse,schema]=await db.execute(`SELECT * FROM OWNERS`)
+        return res.json({success:true,data:repsonse,message: "Data is retrieved successfully"});
+    } catch (error) {
+
+        return res.json({success:false, data:null, message: error,})
+        
+    }
+})
+
+app.post("/cars/create",async(req,res)=>{
+    const {model,plate_number,owner_id,price}=req.body;
+    try {
+        const [response,schema]=await db.execute(`INSERT INTO CARS (model,plate_number,owner_id,price) VALUES (?,?,?,?)`,[model,plate_number,owner_id,price]);
+
+        return res.json({data:response,success:true, message: "Cars is created successfully"});
+    } catch (error) {
+        
+        return res.json({data:null,error,message: "Car couldn't be created"});
+    }
+})
+
+app.get("/cars/view-all",async(req,res)=>{
+try {
+    const [cars,schema]=await db.execute(`SELECT * FROM CARS`)
+    return res.json({data:cars,success:false, message : "Data is retrieved successfully"});
+
+} catch (error) {
+
+
+    return res.json({error, success:false,message: "Data is not retrieved"});
+    
+}
+})
+
+// FETCH OWNERS WITH CARS
+
+app.get("/owners/cars/view-all",async(req,res)=>{
+    const [response,schema]= await db.execute(`SELECT * from OWNERS INNER JOIN CARS ON OWNERS.id = CARS.owner_id`);
+
+    return res.json({data: response,})
+})
+
+
+
+
+
+// PRODUCTS
+
+app.get("/products/view-all",async(req,res)=>{
+
+    try {
+        const [data,schema]=await db.execute(`SELECT * FROM PRODUCTS`);
+
+        return res.json({data,message: "Data is retrieved successfully",success:true});
+    } catch (error) {
+        
+
+        return res.json({error,message: error.message});
+
+    }
+
+
+    return res.json({});
+})
+
+
+app.get("/products/:category",async(req,res)=>{
+    const {category}=req.params;
+    try {
+        const [data,schema]=await db.execute(`SELECT * FROM PRODUCTS where category=?`,[category])
+
+
+        return res.json({data,message: "Products are fetched successfully"});
+    } catch (error) {
+
+
+        return res.json({error, message: error.message});
+        
+    }
+})
+
 app.listen(4242,()=>{console.log("Sever is running on port 4242")});
