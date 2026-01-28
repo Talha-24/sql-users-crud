@@ -31,7 +31,6 @@ app.get("/users/view-all", async (req, res) => {
         message: "Data is retrieved successfully",
       });
   } catch (error) {
-    console.log('error ',error);
     return res.status(500).json({ error, success: false });
   }
 });
@@ -163,6 +162,28 @@ app.get("/owners/cars/view-all",async(req,res)=>{
 
 // PRODUCTS
 
+app.get("/products/view-one/:id",async(req,res)=>{
+    const {id}=req.params;
+
+    try {
+        const [data,schema]=await db.execute(`SELECT * FROM PRODUCTS where id=?`,[id])
+
+    //   FETCHING USER DATa
+
+
+     const [userData,userSchema]=await db.execute(`SELECT * FROM USERS where id=?`,[data[0].user_id]);
+
+        const modifiedProduct={...data[0],user_details:userData[0]};
+
+        return  res.json({data:modifiedProduct,message: "Data is retrieved successfully",success:true});
+    } catch (error) {
+
+        return res.json({error,message:error.message});
+        
+    }
+
+})
+
 app.get("/products/view-all",async(req,res)=>{
 
     try {
@@ -193,6 +214,36 @@ app.get("/products/:category",async(req,res)=>{
 
         return res.json({error, message: error.message});
         
+    }
+})
+
+
+// USER
+
+app.get("/users/:id",async(req,res)=>{
+    const {id}=req.params;
+    try {
+        const [user,schema]=await db.execute(`SELECT * FROM USERS where id=?`,[id])
+
+        return res.json({data:{...user[0]},message: "User is retrieved successfully",success:true})
+    } catch (error) {
+
+        return res.json({error,message: "Error in fetching user details"});
+        
+    }
+})
+
+
+app.get("/product/user/:id",async(req,res)=>{
+    const {id}=req.params;
+    try {
+        const [products,schema]=await db.execute(`SELECT * FROM PRODUCTS where user_id=?`,[id]);
+
+
+        return res.json({data:products,message:"Products are retrieved successfully",success:true});
+    } catch (error) {
+        
+        return res.json({error,message:error?.message, success:false});
     }
 })
 
